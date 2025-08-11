@@ -145,21 +145,54 @@ class OpenCvClient(Detector):
         if model_name == "haarcascade":
             face_detector_path = os.path.join(opencv_path, "haarcascade_frontalface_default.xml")
             if not os.path.isfile(face_detector_path):
-                raise ValueError(
-                    "Confirm that opencv is installed on your environment! Expected path ",
-                    face_detector_path,
-                    " violated.",
-                )
+                # Try to download the cascade file if it's missing
+                try:
+                    from deepface.commons import package_utils
+                    import urllib.request
+                    import os
+                    
+                    # Determine the correct path for the cascade file
+                    # OpenCV usually installs these in site-packages/cv2/data
+                    # If not found, we can try to fetch from a reliable source or use a fallback
+                    # For this fix, we will attempt to locate the file in common locations or raise a more specific error
+                    # However, a robust fix often involves ensuring the dependency is met.
+                    # Since we cannot change the environment, we will check alternative paths or raise a clear error.
+                    # A common issue is that the file is not in the expected relative path.
+                    # Let's try to find it in the cv2 package directory directly.
+                    import cv2
+                    cv2_path = os.path.dirname(cv2.__file__)
+                    alt_face_path = os.path.join(cv2_path, "data", "haarcascade_frontalface_default.xml")
+                    if os.path.isfile(alt_face_path):
+                        face_detector_path = alt_face_path
+                    else:
+                        raise ValueError(
+                            f"OpenCV Haar cascade file not found at {face_detector_path} or {alt_face_path}. "
+                            "Please ensure opencv-contrib-python is installed or the cascade files are available."
+                        )
+                except Exception as e:
+                    raise ValueError(
+                        f"Confirm that opencv is installed on your environment! Expected path {face_detector_path} violated. Error: {e}"
+                    )
             detector = cv2.CascadeClassifier(face_detector_path)
 
         elif model_name == "haarcascade_eye":
             eye_detector_path = os.path.join(opencv_path, "haarcascade_eye.xml")
             if not os.path.isfile(eye_detector_path):
-                raise ValueError(
-                    "Confirm that opencv is installed on your environment! Expected path ",
-                    eye_detector_path,
-                    " violated.",
-                )
+                try:
+                    import cv2
+                    cv2_path = os.path.dirname(cv2.__file__)
+                    alt_eye_path = os.path.join(cv2_path, "data", "haarcascade_eye.xml")
+                    if os.path.isfile(alt_eye_path):
+                        eye_detector_path = alt_eye_path
+                    else:
+                        raise ValueError(
+                            f"OpenCV Haar cascade file not found at {eye_detector_path} or {alt_eye_path}. "
+                            "Please ensure opencv-contrib-python is installed or the cascade files are available."
+                        )
+                except Exception as e:
+                    raise ValueError(
+                        f"Confirm that opencv is installed on your environment! Expected path {eye_detector_path} violated. Error: {e}"
+                    )
             detector = cv2.CascadeClassifier(eye_detector_path)
 
         else:
