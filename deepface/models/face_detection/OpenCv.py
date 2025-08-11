@@ -141,27 +141,10 @@ class OpenCvClient(Detector):
         Returns:
             model (Any)
         """
-        opencv_path = self.__get_opencv_path()
         if model_name == "haarcascade":
-            face_detector_path = os.path.join(opencv_path, "haarcascade_frontalface_default.xml")
-            if not os.path.isfile(face_detector_path):
-                raise ValueError(
-                    "Confirm that opencv is installed on your environment! Expected path ",
-                    face_detector_path,
-                    " violated.",
-                )
-            detector = cv2.CascadeClassifier(face_detector_path)
-
+            detector = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
         elif model_name == "haarcascade_eye":
-            eye_detector_path = os.path.join(opencv_path, "haarcascade_eye.xml")
-            if not os.path.isfile(eye_detector_path):
-                raise ValueError(
-                    "Confirm that opencv is installed on your environment! Expected path ",
-                    eye_detector_path,
-                    " violated.",
-                )
-            detector = cv2.CascadeClassifier(eye_detector_path)
-
+            detector = cv2.CascadeClassifier("haarcascade_eye.xml")
         else:
             raise ValueError(f"unimplemented model_name for build_cascade - {model_name}")
 
@@ -173,4 +156,4 @@ class OpenCvClient(Detector):
         Returns:
             installation_path (str)
         """
-        return os.path.join(os.path.dirname(cv2.__file__), "data")
+        return cv2.data.haarcascades()

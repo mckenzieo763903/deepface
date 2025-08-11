@@ -1,24 +1,6 @@
 name: Tests
 
-on: 
-  push:
-    paths:
-      - '.github/workflows/tests.yml'
-      - 'deepface/**'  
-      - 'tests/**'
-      - 'api/**'
-      - 'requirements.txt'
-      - '.gitignore'
-      - 'setup.py'
-  pull_request:
-    paths:
-      - '.github/workflows/tests.yml'
-      - 'deepface/**'  
-      - 'tests/**'
-      - 'api/**'
-      - 'requirements.txt'
-      - '.gitignore'
-      - 'setup.py'
+on: push
 
 jobs:
   unit-tests:
