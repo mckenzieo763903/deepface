@@ -146,9 +146,8 @@ class OpenCvClient(Detector):
             face_detector_path = os.path.join(opencv_path, "haarcascade_frontalface_default.xml")
             if not os.path.isfile(face_detector_path):
                 raise ValueError(
-                    "Confirm that opencv is installed on your environment! Expected path ",
-                    face_detector_path,
-                    " violated.",
+                    "Confirm that opencv is installed on your environment! "
+                    f"Expected path {face_detector_path} violated."
                 )
             detector = cv2.CascadeClassifier(face_detector_path)
 
@@ -156,9 +155,8 @@ class OpenCvClient(Detector):
             eye_detector_path = os.path.join(opencv_path, "haarcascade_eye.xml")
             if not os.path.isfile(eye_detector_path):
                 raise ValueError(
-                    "Confirm that opencv is installed on your environment! Expected path ",
-                    eye_detector_path,
-                    " violated.",
+                    "Confirm that opencv is installed on your environment! "
+                    f"Expected path {eye_detector_path} violated."
                 )
             detector = cv2.CascadeClassifier(eye_detector_path)
 
@@ -173,4 +171,18 @@ class OpenCvClient(Detector):
         Returns:
             installation_path (str)
         """
-        return os.path.join(os.path.dirname(cv2.__file__), "data")
+        haarcascades_path = None
+        cv2_data = getattr(cv2, "data", None)
+        if cv2_data is None:
+            try:
+                from cv2 import data as cv2_data  # pylint: disable=import-outside-toplevel
+            except ImportError:
+                cv2_data = None
+        if cv2_data is not None:
+            haarcascades_path = getattr(cv2_data, "haarcascades", None)
+
+        if haarcascades_path and os.path.isdir(haarcascades_path):
+            return haarcascades_path
+
+        cv2_file = getattr(cv2, "__file__", None) or ""
+        return os.path.join(os.path.dirname(cv2_file), "data")
